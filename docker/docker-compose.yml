@@ -1,6 +1,6 @@
 services:
   channelhoarder:
-    image: ghcr.io/sworcery/channelhoarder:latest
+    image: ghcr.io/adam2893/channelhoarder:latest
     # To build locally instead, comment the image line above and uncomment:
     # build:
     #   context: ..

@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <Container version="2">
     <Name>ChannelHoarder</Name>
-    <Repository>ghcr.io/sworcery/channelhoarder:latest</Repository>
-    <Registry>https://github.com/sworcery/ChannelHoarder/pkgs/container/channelhoarder</Registry>
+    <Repository>ghcr.io/adam2893/channelhoarder:latest</Repository>
+    <Registry>https://github.com/adam2893/ChannelHoarder/pkgs/container/channelhoarder</Registry>
     <Network>bridge</Network>
     <Privileged>false</Privileged>
     <Support>https://forums.unraid.net/topic/198136-support-channelhoarder-self-hosted-video-channel-archiver/</Support>
-    <Project>https://github.com/sworcery/ChannelHoarder</Project>
-    <TemplateURL>https://raw.githubusercontent.com/sworcery/ChannelHoarder/main/docker/unraid-template.xml</TemplateURL>
+    <Project>https://github.com/adam2893/ChannelHoarder</Project>
+    <TemplateURL>https://raw.githubusercontent.com/adam2893/ChannelHoarder/main/docker/unraid-template.xml</TemplateURL>
     <Overview>
         ChannelHoarder is a self-hosted video channel archiver with a modern web UI.
         Monitor and automatically download videos from YouTube, Rumble, Twitch, Dailymotion, Vimeo, and Odysee.
@@ -18,7 +18,7 @@
     </Overview>
     <Category>MediaApp:Video Downloaders</Category>
     <WebUI>http://[IP]:[PORT:8587]</WebUI>
-    <Icon>https://raw.githubusercontent.com/sworcery/ChannelHoarder/main/frontend/public/logo.png</Icon>
+    <Icon>https://raw.githubusercontent.com/adam2893/ChannelHoarder/main/frontend/public/logo.png</Icon>
     <ExtraParams>--init</ExtraParams>
     <Changes>
 ### v1.4.2
