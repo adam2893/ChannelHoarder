@@ -271,6 +271,17 @@ class DownloadService:
             "file_size": self._format_bytes(file_size),
         })
 
+        # ── Post-download: check if this video is part of a multi-part group ─
+        # Fire-and-forget: if all parts are downloaded, trigger merge
+        try:
+            async with async_session() as check_db:
+                check_video = await check_db.get(Video, video_id)
+                if check_video and check_video.episode_group_key:
+                    from app.services.merge_service import check_and_merge_group
+                    await check_and_merge_group(video_id)
+        except Exception as merge_err:
+            logger.warning("Multi-part merge check failed for video %d: %s", video_id, merge_err)
+
         logger.info("Downloaded: %s (%s)", vdata.title, self._format_bytes(file_size))
         return True
 

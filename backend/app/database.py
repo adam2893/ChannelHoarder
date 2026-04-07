@@ -65,6 +65,33 @@ async def init_database():
             await conn.execute(
                 text("ALTER TABLE videos ADD COLUMN is_short BOOLEAN DEFAULT 0 NOT NULL")
             )
+        if "episode_group_key" not in video_columns:
+            await conn.execute(
+                text("ALTER TABLE videos ADD COLUMN episode_group_key VARCHAR(512)")
+            )
+            await conn.execute(
+                text("CREATE INDEX IF NOT EXISTS ix_videos_episode_group_key ON videos (episode_group_key)")
+            )
+        if "part_number" not in video_columns:
+            await conn.execute(
+                text("ALTER TABLE videos ADD COLUMN part_number INTEGER")
+            )
+        if "total_parts" not in video_columns:
+            await conn.execute(
+                text("ALTER TABLE videos ADD COLUMN total_parts INTEGER")
+            )
+
+        # Add multi-part columns to channels table
+        result3 = await conn.execute(text("PRAGMA table_info(channels)"))
+        channel_columns = {row[1] for row in result3.fetchall()}
+        if "combine_multi_part" not in channel_columns:
+            await conn.execute(
+                text("ALTER TABLE channels ADD COLUMN combine_multi_part BOOLEAN DEFAULT 0 NOT NULL")
+            )
+        if "multi_part_pattern" not in channel_columns:
+            await conn.execute(
+                text("ALTER TABLE channels ADD COLUMN multi_part_pattern VARCHAR(512)")
+            )
 
 
 # Note: get_db() dependency is defined in deps.py — do not duplicate here

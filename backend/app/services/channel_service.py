@@ -239,10 +239,48 @@ class ChannelService:
 
             season = upload_date.year
 
-            # Calculate episode number from pre-fetched counts, increment locally
-            season_episode_counts.setdefault(season, 0)
-            season_episode_counts[season] += 1
-            episode = season_episode_counts[season]
+            # ── Multi-part episode detection ──────────────────────────────
+            episode_group_key = None
+            part_number = None
+            total_parts = None
+            episode = None  # Will be set below
+
+            if getattr(channel, 'combine_multi_part', False):
+                from app.services.multi_part_service import detect_multi_part, DEFAULT_MULTI_PART_PATTERN
+                mp_pattern = channel.multi_part_pattern or DEFAULT_MULTI_PART_PATTERN
+                mp_match = detect_multi_part(title, mp_pattern, channel.channel_id)
+
+                if mp_match:
+                    episode_group_key = mp_match.group_key
+                    part_number = mp_match.part_number
+                    total_parts = mp_match.total_parts
+
+                    # Look for existing videos in the same group to reuse
+                    # the same season/episode number
+                    existing_group = await self.db.execute(
+                        select(Video)
+                        .where(Video.channel_id == channel.id)
+                        .where(Video.episode_group_key == episode_group_key)
+                        .order_by(Video.part_number.asc())
+                        .limit(1)
+                    )
+                    existing_part = existing_group.scalar_one_or_none()
+
+                    if existing_part:
+                        # Reuse the same season/episode as the existing group member
+                        season = existing_part.season
+                        episode = existing_part.episode
+                        logger.info(
+                            "Multi-part: %s is part %d/%d of group (S%dE%03d)",
+                            title[:60], part_number, total_parts,
+                            season, episode,
+                        )
+
+            # If episode not yet assigned (new group or non-multi-part), increment
+            if episode is None:
+                season_episode_counts.setdefault(season, 0)
+                season_episode_counts[season] += 1
+                episode = season_episode_counts[season]
 
             video = Video(
                 video_id=vid_id,
@@ -255,6 +293,9 @@ class ChannelService:
                 season=season,
                 episode=episode,
                 status="pending",
+                episode_group_key=episode_group_key,
+                part_number=part_number,
+                total_parts=total_parts,
             )
 
             self.db.add(video)

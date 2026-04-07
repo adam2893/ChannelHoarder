@@ -13,6 +13,8 @@ export interface Channel {
   check_schedule: string | null
   enabled: boolean
   include_shorts: boolean
+  combine_multi_part: boolean
+  multi_part_pattern: string | null
   last_scanned_at: string | null
   total_videos: number
   downloaded_count: number
@@ -36,6 +38,9 @@ export interface Video {
   episode: number
   status: string
   is_short: boolean
+  episode_group_key: string | null
+  part_number: number | null
+  total_parts: number | null
   file_path: string | null
   file_size: number | null
   quality_downloaded: string | null
@@ -83,7 +88,7 @@ export interface WSMessage {
   payload: Record<string, any>
 }
 
-export type VideoStatus = "pending" | "pending_review" | "queued" | "downloading" | "completed" | "failed" | "skipped"
+export type VideoStatus = "pending" | "pending_review" | "queued" | "downloading" | "completed" | "failed" | "skipped" | "merged"
 
 export const STATUS_COLORS: Record<string, string> = {
   pending: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
@@ -91,6 +96,7 @@ export const STATUS_COLORS: Record<string, string> = {
   queued: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
   downloading: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
   completed: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  merged: "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300",
   failed: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
   skipped: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
 }

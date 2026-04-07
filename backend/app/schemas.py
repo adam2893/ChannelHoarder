@@ -24,6 +24,8 @@ class ChannelCreate(BaseModel):
     naming_template: Optional[str] = None
     download_dir: Optional[str] = Field(default=None, description="Custom download directory (overrides global default)")
     enabled: bool = True
+    combine_multi_part: bool = False
+    multi_part_pattern: Optional[str] = None
 
 
 class ChannelUpdate(BaseModel):
@@ -33,6 +35,8 @@ class ChannelUpdate(BaseModel):
     check_schedule: Optional[str] = None
     enabled: Optional[bool] = None
     include_shorts: Optional[bool] = None
+    combine_multi_part: Optional[bool] = None
+    multi_part_pattern: Optional[str] = None
 
 
 class ChannelResponse(UTCBaseModel):
@@ -50,6 +54,8 @@ class ChannelResponse(UTCBaseModel):
     check_schedule: Optional[str]
     enabled: bool
     include_shorts: bool
+    combine_multi_part: bool = False
+    multi_part_pattern: Optional[str] = None
     last_scanned_at: Optional[datetime]
     total_videos: int
     downloaded_count: int
@@ -74,6 +80,9 @@ class VideoResponse(UTCBaseModel):
     episode: int
     status: str
     is_short: bool
+    episode_group_key: Optional[str] = None
+    part_number: Optional[int] = None
+    total_parts: Optional[int] = None
     file_path: Optional[str]
     file_size: Optional[int]
     quality_downloaded: Optional[str]

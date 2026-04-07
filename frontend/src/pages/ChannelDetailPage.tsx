@@ -460,6 +460,45 @@ export default function ChannelDetailPage() {
               </div>
             </div>
           )}
+
+          {/* Multi-Part Episode Combining */}
+          <div className="mt-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              Multi-Part Episode Combining
+            </p>
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={channel.combine_multi_part || false}
+                  onChange={(e) => updateMutation.mutate({ combine_multi_part: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="text-sm">Combine multi-part episodes</span>
+              </label>
+              <p className="text-xs text-muted-foreground">
+                {channel.combine_multi_part
+                  ? "Videos detected as parts of the same episode (e.g. \"Part 1/4\") will be automatically merged into a single file after all parts are downloaded."
+                  : "When enabled, videos detected as parts of the same episode will be merged into one file for Plex."}
+              </p>
+              {channel.combine_multi_part && (
+                <div>
+                  <label className="block text-xs text-muted-foreground mb-1">Detection Pattern (regex)</label>
+                  <input
+                    type="text"
+                    value={channel.multi_part_pattern || ""}
+                    placeholder="Leave empty for default pattern"
+                    onChange={(e) => updateMutation.mutate({ multi_part_pattern: e.target.value || null })}
+                    className="w-full px-2 py-1.5 rounded-md border bg-background text-sm font-mono"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Default pattern matches: (1/4), [Part 2/4], Part 3 of 4, พาร์ท 1/4, bare 1/4.
+                    Two capture groups required: (part_number) and (total_parts).
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Monitoring */}
@@ -553,6 +592,7 @@ export default function ChannelDetailPage() {
             <option value="downloading">Downloading</option>
             <option value="failed">Failed</option>
             <option value="skipped">Skipped</option>
+            <option value="merged">Merged (Part)</option>
           </select>
         </div>
 
@@ -641,7 +681,12 @@ export default function ChannelDetailPage() {
                         <td className="px-3 py-2 text-muted-foreground">
                           S{video.season}E{String(video.episode).padStart(3, "0")}
                         </td>
-                        <td className="px-3 py-2 max-w-xs truncate" title={video.title}>{video.title}</td>
+                        <td className="px-3 py-2 max-w-xs truncate" title={video.title}>
+                          {video.part_number && video.total_parts ? (
+                            <span className="text-xs text-muted-foreground mr-1">[{video.part_number}/{video.total_parts}]</span>
+                          ) : null}
+                          {video.title}
+                        </td>
                         <td className="px-3 py-2 text-muted-foreground">{formatDate(video.upload_date)}</td>
                         <td className="px-3 py-2 text-muted-foreground">
                           {video.duration ? formatDuration(video.duration) : "-"}
