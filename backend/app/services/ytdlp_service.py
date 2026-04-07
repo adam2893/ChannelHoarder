@@ -74,6 +74,34 @@ class YtdlpService:
         finally:
             self._cleanup_cookie_tmp(opts)
 
+    def get_playlist_video_list(self, playlist_url: str, platform: str = "youtube") -> list[dict]:
+        """Get flat list of all videos in a specific playlist."""
+        opts = self._base_opts(platform=platform)
+        opts.update({
+            "extract_flat": "in_playlist",
+            "ignoreerrors": True,
+            "quiet": False,
+        })
+
+        logger.info("Fetching playlist video list from: %s", playlist_url)
+
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(playlist_url, download=False)
+                if not info:
+                    logger.warning("yt-dlp returned None for playlist %s", playlist_url)
+                    return []
+                entries = list(info.get("entries", []))
+                # Filter out None entries (failed extractions)
+                entries = [e for e in entries if e is not None]
+                logger.info("Found %d entries in playlist %s", len(entries), playlist_url)
+                return entries
+        except Exception as e:
+            logger.error("Failed to list playlist videos for %s: %s", playlist_url, e)
+            return []
+        finally:
+            self._cleanup_cookie_tmp(opts)
+
     @staticmethod
     def get_rss_upload_dates(channel_id: str, platform: str = "youtube") -> dict[str, str]:
         """Fetch upload dates from YouTube's public RSS feed (no auth needed).

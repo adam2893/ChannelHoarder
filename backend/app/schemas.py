@@ -19,13 +19,14 @@ class UTCBaseModel(BaseModel):
 
 # --- Channel Schemas ---
 class ChannelCreate(BaseModel):
-    url: str = Field(..., description="Channel URL (YouTube, Rumble, Twitch, etc.)")
+    url: str = Field(..., description="Channel or playlist URL (YouTube, Rumble, Twitch, etc.)")
     quality: str = Field(default="best", pattern="^(best|1080p|720p|480p)$")
     naming_template: Optional[str] = None
     download_dir: Optional[str] = Field(default=None, description="Custom download directory (overrides global default)")
     enabled: bool = True
     combine_multi_part: bool = False
     multi_part_pattern: Optional[str] = None
+    playlist_url: Optional[str] = Field(default=None, description="Playlist URL if source is a playlist (auto-detected)")
 
 
 class ChannelUpdate(BaseModel):
@@ -37,6 +38,7 @@ class ChannelUpdate(BaseModel):
     include_shorts: Optional[bool] = None
     combine_multi_part: Optional[bool] = None
     multi_part_pattern: Optional[str] = None
+    playlist_url: Optional[str] = None
 
 
 class ChannelResponse(UTCBaseModel):
@@ -56,6 +58,7 @@ class ChannelResponse(UTCBaseModel):
     include_shorts: bool
     combine_multi_part: bool = False
     multi_part_pattern: Optional[str] = None
+    playlist_url: Optional[str] = None
     last_scanned_at: Optional[datetime]
     total_videos: int
     downloaded_count: int

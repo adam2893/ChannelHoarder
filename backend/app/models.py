@@ -38,6 +38,7 @@ class Channel(Base):
     include_shorts: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     combine_multi_part: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="0")
     multi_part_pattern: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    playlist_url: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
     last_scanned_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     total_videos: Mapped[int] = mapped_column(Integer, default=0)
     downloaded_count: Mapped[int] = mapped_column(Integer, default=0)

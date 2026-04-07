@@ -39,6 +39,13 @@ class ChannelService:
         if not info:
             raise ValueError(f"Could not find channel for: {data.url}")
 
+        # Detect if the URL is a playlist
+        playlist_url = None
+        info_type = info.get("_type", "")
+        if info_type == "playlist":
+            playlist_url = data.url
+            logger.info("Detected playlist URL: %s", playlist_url)
+
         channel_id = info.get("channel_id") or info.get("id", "")
         channel_name = info.get("channel") or info.get("uploader") or info.get("title", "Unknown")
         # Prefer channel_url (base channel URL) over webpage_url (may include /featured etc.)
@@ -80,6 +87,7 @@ class ChannelService:
             download_dir=data.download_dir,
             enabled=data.enabled,
             health_status="healthy",
+            playlist_url=playlist_url,
         )
 
         self.db.add(channel)
@@ -125,14 +133,20 @@ class ChannelService:
         return channel
 
     async def scan_channel(self, channel: Channel) -> int:
-        """Scan a channel for new videos. Returns count of newly discovered videos."""
+        """Scan a channel (or playlist) for new videos. Returns count of newly discovered videos."""
         from app.utils.platform_utils import supports_api, supports_rss
         logger.info("Scanning channel: %s", channel.channel_name)
 
         platform = getattr(channel, "platform", "youtube")
+        playlist_url = getattr(channel, "playlist_url", None)
 
-        # Try YouTube Data API first (only for platforms that support it), fall back to yt-dlp
-        if self.yt_api and supports_api(platform):
+        # If channel has a playlist URL, scan only the playlist's videos
+        if playlist_url:
+            logger.info("Using playlist URL for scanning: %s", playlist_url)
+            video_list = await asyncio.to_thread(
+                self.ytdlp.get_playlist_video_list, playlist_url, platform
+            )
+        elif self.yt_api and supports_api(platform):
             try:
                 video_list = await self.yt_api.get_channel_videos(channel.channel_id)
             except Exception as e:

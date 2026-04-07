@@ -92,6 +92,10 @@ async def init_database():
             await conn.execute(
                 text("ALTER TABLE channels ADD COLUMN multi_part_pattern VARCHAR(512)")
             )
+        if "playlist_url" not in channel_columns:
+            await conn.execute(
+                text("ALTER TABLE channels ADD COLUMN playlist_url VARCHAR(1024)")
+            )
 
 
 # Note: get_db() dependency is defined in deps.py — do not duplicate here

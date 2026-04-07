@@ -263,17 +263,22 @@ export default function ChannelDetailPage() {
                     {channel.platform}
                   </span>
                 )}
+                {channel.playlist_url && (
+                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
+                    Playlist
+                  </span>
+                )}
                 <Circle
                   className={`h-3 w-3 flex-shrink-0 fill-current ${HEALTH_COLORS[channel.health_status] || HEALTH_COLORS.unknown}`}
                 />
               </div>
               <a
-                href={channel.channel_url}
+                href={channel.playlist_url || channel.channel_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
               >
-                {channel.channel_url} <ExternalLink className="h-3 w-3" />
+                {channel.playlist_url || channel.channel_url} <ExternalLink className="h-3 w-3" />
               </a>
             </div>
           </div>

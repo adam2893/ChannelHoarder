@@ -15,6 +15,7 @@ export interface Channel {
   include_shorts: boolean
   combine_multi_part: boolean
   multi_part_pattern: string | null
+  playlist_url: string | null
   last_scanned_at: string | null
   total_videos: number
   downloaded_count: number
